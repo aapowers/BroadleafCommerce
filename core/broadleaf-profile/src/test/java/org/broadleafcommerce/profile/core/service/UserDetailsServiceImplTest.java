@@ -17,9 +17,7 @@
  */
 package org.broadleafcommerce.profile.core.service;
 
-import junit.framework.TestCase;
 import org.broadleafcommerce.profile.core.domain.*;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
