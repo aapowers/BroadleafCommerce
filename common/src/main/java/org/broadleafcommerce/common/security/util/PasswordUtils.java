@@ -39,4 +39,22 @@ public class PasswordUtils {
 
         return password;
     }
+
+    /**
+     * This is a duplicate of the generateSecurePassword, except it is not static so that it can be called
+     * when PasswordUtils is passed into a class via dependency injection
+     * @param requiredLength
+     * @return
+     */
+    public String testableGenerateSecurePassword(int requiredLength) {
+
+        int start = 0;
+        int end = CHARS.length();
+        boolean letters = true;
+        boolean numbers = true;
+
+        String password = RandomStringUtils.random(requiredLength, start, end, letters, numbers, CHARS.toCharArray(), RANDOM);
+
+        return password;
+    }
 }
