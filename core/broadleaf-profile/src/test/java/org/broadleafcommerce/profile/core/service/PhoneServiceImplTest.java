@@ -26,7 +26,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 /**
  *
@@ -53,6 +54,7 @@ public class PhoneServiceImplTest {
         when(phoneDaoMock.save(phone)).thenReturn(phone);
         Phone returnedPhone = phoneService.savePhone(phone);
         Assert.assertEquals(phone, returnedPhone);
+        verify(phoneDaoMock, times(1)).save(phone);
     }
 
     @Test
@@ -64,6 +66,7 @@ public class PhoneServiceImplTest {
         when(phoneDaoMock.readPhoneById(phoneId)).thenReturn(phone);
         Phone returnedPhone = phoneService.readPhoneById(phoneId);
         Assert.assertEquals(phone, returnedPhone);
+        verify(phoneDaoMock, times(1)).readPhoneById(phoneId);
     }
 
     @Test
@@ -73,6 +76,7 @@ public class PhoneServiceImplTest {
         when(phoneDaoMock.create()).thenReturn(phone);
         Phone returnedPhone = phoneService.create();
         Assert.assertEquals(phone, returnedPhone);
+        verify(phoneDaoMock, times(1)).create();
     }
 
     @Test
@@ -90,13 +94,13 @@ public class PhoneServiceImplTest {
         when(phoneDaoMock.create()).thenReturn(phoneDest);
         Phone returnedPhone = phoneService.copyPhone(phoneOriginal);
         Assert.assertEquals(phoneOriginal, returnedPhone);
+        verify(phoneDaoMock, times(1)).create();
     }
 
     @Test
     public void testCopyAddress_WithDest_ShouldCopyOriginal() {
         Phone phoneOriginal = generateCompletePhone();
         Phone phoneDest = new PhoneImpl();
-        // mock the service call
         Phone returnedPhone = phoneService.copyPhone(phoneDest, phoneOriginal);
         Assert.assertEquals(phoneOriginal, returnedPhone);
     }

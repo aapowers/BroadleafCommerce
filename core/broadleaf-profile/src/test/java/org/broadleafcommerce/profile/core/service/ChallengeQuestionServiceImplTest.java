@@ -29,7 +29,8 @@ import org.mockito.MockitoAnnotations;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 /**
  *
@@ -57,6 +58,7 @@ public class ChallengeQuestionServiceImplTest {
         when(challengeQuestionDaoMock.readChallengeQuestions()).thenReturn(challengeQuestions);
         List<ChallengeQuestion> returnedChallengeQuestions = challengeQuestionService.readChallengeQuestions();
         Assert.assertEquals(challengeQuestions, returnedChallengeQuestions);
+        verify(challengeQuestionDaoMock, times(1)).readChallengeQuestions();
     }
 
     @Test
@@ -67,5 +69,6 @@ public class ChallengeQuestionServiceImplTest {
         when(challengeQuestionDaoMock.readChallengeQuestionById(challengeQuestionId)).thenReturn(challengeQuestion);
         ChallengeQuestion returnedChallengeQuestion = challengeQuestionService.readChallengeQuestionById(challengeQuestionId);
         Assert.assertEquals(challengeQuestion, returnedChallengeQuestion);
+        verify(challengeQuestionDaoMock, times(1)).readChallengeQuestionById(challengeQuestionId);
     }
 }

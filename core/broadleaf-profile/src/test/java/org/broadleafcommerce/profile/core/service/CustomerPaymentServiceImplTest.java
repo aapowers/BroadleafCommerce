@@ -23,6 +23,7 @@ import org.broadleafcommerce.profile.core.domain.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -31,8 +32,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
 
 /**
  *
@@ -61,6 +63,8 @@ public class CustomerPaymentServiceImplTest {
         when(customerPaymentDaoMock.save(customerPayment)).thenReturn(customerPayment);
         CustomerPayment returnedCustomerPayment = customerPaymentService.saveCustomerPayment(customerPayment);
         Assert.assertEquals(customerPayment, returnedCustomerPayment);
+        verify(customerPaymentDaoMock, times(1)).save(customerPayment);
+
     }
 
     @Test
@@ -70,6 +74,7 @@ public class CustomerPaymentServiceImplTest {
         when(customerPaymentDaoMock.readCustomerPaymentsByCustomerId(customerId)).thenReturn(customerPayments);
         List<CustomerPayment> returnedCustomerPayments = customerPaymentService.readCustomerPaymentsByCustomerId(customerId);
         Assert.assertEquals(customerPayments, returnedCustomerPayments);
+        verify(customerPaymentDaoMock, times(1)).readCustomerPaymentsByCustomerId(customerId);
     }
 
     @Test
@@ -79,6 +84,7 @@ public class CustomerPaymentServiceImplTest {
         when(customerPaymentDaoMock.readCustomerPaymentById(customerPaymentId)).thenReturn(customerPayment);
         CustomerPayment returnedCustomerPayment = customerPaymentService.readCustomerPaymentById(customerPaymentId);
         Assert.assertEquals(customerPayment, returnedCustomerPayment);
+        verify(customerPaymentDaoMock, times(1)).readCustomerPaymentById(customerPaymentId);
     }
 
     @Test
@@ -88,6 +94,7 @@ public class CustomerPaymentServiceImplTest {
         when(customerPaymentDaoMock.readCustomerPaymentByToken(customerPaymentToken)).thenReturn(customerPayment);
         CustomerPayment returnedCustomerPayment = customerPaymentService.readCustomerPaymentByToken(customerPaymentToken);
         Assert.assertEquals(customerPayment, returnedCustomerPayment);
+        verify(customerPaymentDaoMock, times(1)).readCustomerPaymentByToken(customerPaymentToken);
     }
 
     @Test
@@ -95,6 +102,7 @@ public class CustomerPaymentServiceImplTest {
         long customerPaymentId = 1L;
         doNothing().when(customerPaymentDaoMock).deleteCustomerPaymentById(customerPaymentId);
         customerPaymentService.deleteCustomerPaymentById(customerPaymentId);
+        verify(customerPaymentDaoMock, times(1)).deleteCustomerPaymentById(customerPaymentId);
     }
 
     @Test
@@ -102,6 +110,7 @@ public class CustomerPaymentServiceImplTest {
         String customerPaymentToken = "asdf";
         doNothing().when(customerPaymentDaoMock).deleteCustomerPaymentByToken(customerPaymentToken);
         customerPaymentService.deleteCustomerPaymentByToken(customerPaymentToken);
+        verify(customerPaymentDaoMock, times(1)).deleteCustomerPaymentByToken(customerPaymentToken);
     }
 
     @Test
@@ -110,6 +119,7 @@ public class CustomerPaymentServiceImplTest {
         CustomerPayment customerPayment = new CustomerPaymentImpl();
         when(customerPaymentDaoMock.create()).thenReturn(customerPayment);
         customerPaymentService.create();
+        verify(customerPaymentDaoMock, times(1)).create();
     }
 
     @Test
@@ -130,6 +140,7 @@ public class CustomerPaymentServiceImplTest {
         when(customerPaymentDaoMock.readCustomerPaymentsByCustomerId(customerId)).thenReturn(customerPayments);
         CustomerPayment customerPayment = customerPaymentService.findDefaultPaymentForCustomer(customer);
         Assert.assertNull(customerPayment);
+        verify(customerPaymentDaoMock, times(1)).readCustomerPaymentsByCustomerId(customerId);
     }
 
     @Test
@@ -144,6 +155,7 @@ public class CustomerPaymentServiceImplTest {
         when(customerPaymentDaoMock.readCustomerPaymentsByCustomerId(customerId)).thenReturn(customerPayments);
         CustomerPayment returnedCustomerPayment = customerPaymentService.findDefaultPaymentForCustomer(customer);
         Assert.assertEquals(customerPayment2, returnedCustomerPayment);
+        verify(customerPaymentDaoMock, times(1)).readCustomerPaymentsByCustomerId(customerId);
     }
 
     @Test
@@ -157,6 +169,9 @@ public class CustomerPaymentServiceImplTest {
         when(customerPaymentDaoMock.save(customerPayment)).thenReturn(customerPayment);
         CustomerPayment returnedCustomerPayment = customerPaymentService.setAsDefaultPayment(customerPayment);
         Assert.assertTrue(returnedCustomerPayment.isDefault());
+        InOrder inOrder = inOrder(customerPaymentDaoMock);
+        inOrder.verify(customerPaymentDaoMock, calls(1)).readCustomerPaymentsByCustomerId(customerId);
+        inOrder.verify(customerPaymentDaoMock, calls(1)).save(customerPayment);
     }
 
     @Test
@@ -174,6 +189,10 @@ public class CustomerPaymentServiceImplTest {
         when(customerPaymentDaoMock.save(customerPayment1)).thenReturn(customerPayment1);
         CustomerPayment returnedCustomerPayment = customerPaymentService.setAsDefaultPayment(customerPayment1);
         Assert.assertTrue(returnedCustomerPayment.isDefault());
+        InOrder inOrder = inOrder(customerPaymentDaoMock);
+        inOrder.verify(customerPaymentDaoMock, calls(1)).readCustomerPaymentsByCustomerId(customerId);
+        inOrder.verify(customerPaymentDaoMock, calls(1)).save(customerPayment2);
+        inOrder.verify(customerPaymentDaoMock, calls(1)).save(customerPayment1);
     }
 
     @Test
@@ -188,6 +207,9 @@ public class CustomerPaymentServiceImplTest {
         when(customerPaymentDaoMock.save(customerPayment2)).thenReturn(customerPayment2);
         when(customerPaymentDaoMock.readCustomerPaymentsByCustomerId(customerId)).thenReturn(customerPayments);
         customerPaymentService.clearDefaultPaymentStatus(customer);
+        InOrder inOrder = inOrder(customerPaymentDaoMock);
+        inOrder.verify(customerPaymentDaoMock, calls(1)).readCustomerPaymentsByCustomerId(customerId);
+        inOrder.verify(customerPaymentDaoMock, calls(1)).save(customerPayment2);
     }
 
     @Test
@@ -200,6 +222,7 @@ public class CustomerPaymentServiceImplTest {
         List<CustomerPayment> customerPayments = Arrays.asList(customerPayment1, customerPayment2);
         when(customerPaymentDaoMock.readCustomerPaymentsByCustomerId(customerId)).thenReturn(customerPayments);
         customerPaymentService.clearDefaultPaymentStatus(customer);
+        verify(customerPaymentDaoMock, times(1)).readCustomerPaymentsByCustomerId(customerId);
     }
 
     @Test
@@ -219,5 +242,7 @@ public class CustomerPaymentServiceImplTest {
         Customer returnedCustomer = customerPaymentService.deleteCustomerPaymentFromCustomer(customer, customerPayment2);
         Assert.assertEquals(1, returnedCustomer.getCustomerPayments().size());
         Assert.assertEquals(customerPayment1, returnedCustomer.getCustomerPayments().get(0));
+        verify(customerServiceMock, times(1)).saveCustomer(customer);
+
     }
 }

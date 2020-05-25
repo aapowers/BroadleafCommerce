@@ -30,6 +30,7 @@ import org.broadleafcommerce.profile.core.service.exception.AddressVerificationE
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -65,6 +66,7 @@ public class AddressServiceImplTest {
         when(addressDaoMock.save(address)).thenReturn(address);
         Address returnedAddress = addressService.saveAddress(address);
         Assert.assertEquals(address, returnedAddress);
+        verify(addressDaoMock, times(1)).save(address);
     }
 
     @Test
@@ -76,6 +78,7 @@ public class AddressServiceImplTest {
         when(addressDaoMock.readAddressById(addressId)).thenReturn(address);
         Address returnedAddress = addressService.readAddressById(addressId);
         Assert.assertEquals(address, returnedAddress);
+        verify(addressDaoMock, times(1)).readAddressById(addressId);
     }
 
     @Test
@@ -85,6 +88,7 @@ public class AddressServiceImplTest {
         when(addressDaoMock.create()).thenReturn(address);
         Address returnedAddress = addressService.create();
         Assert.assertEquals(address, returnedAddress);
+        verify(addressDaoMock, times(1)).create();
     }
 
     @Test
@@ -93,6 +97,7 @@ public class AddressServiceImplTest {
         // mock the service call that would call the database
         doNothing().when(addressDaoMock).delete(address);
         addressService.delete(address);
+        verify(addressDaoMock, times(1)).delete(address);
     }
 
     @Test(expected = AddressVerificationException.class)
@@ -136,6 +141,9 @@ public class AddressServiceImplTest {
         ).thenReturn(addressOriginal.getPhonePrimary());
         Address returnedAddress = addressService.copyAddress(addressOriginal);
         Assert.assertEquals(addressOriginal, returnedAddress);
+        InOrder inOrder = inOrder(addressDaoMock, phoneServiceMock);
+        inOrder.verify(addressDaoMock, calls(1)).create();
+        inOrder.verify(phoneServiceMock, calls(1)).copyPhone(any(), any());
     }
 
     @Test
@@ -149,6 +157,8 @@ public class AddressServiceImplTest {
         ).thenReturn(addressOriginal.getPhonePrimary());
         Address returnedAddress = addressService.copyAddress(addressDest, addressOriginal);
         Assert.assertEquals(addressOriginal, returnedAddress);
+        verifyZeroInteractions(addressDaoMock);
+        verify(phoneServiceMock, times(3)).copyPhone(any(), any());
     }
 
     /**
@@ -171,6 +181,7 @@ public class AddressServiceImplTest {
             addressService.populateAddressISOCountrySub(address);
             Assert.assertEquals(countrySubdivision.getAbbreviation(), address.getIsoCountrySubdivision());
         }
+        verify(cssMock, times(4)).findSubdivisionByCountryAndAltAbbreviation(any(), any());
     }
 
     private static List<Object[]> getValidAddresses() {
@@ -222,6 +233,7 @@ public class AddressServiceImplTest {
             addressService.populateAddressISOCountrySub(address);
             Assert.assertNull(address.getIsoCountrySubdivision());
         }
+        verify(cssMock, times(4)).findSubdivisionByCountryAndAltAbbreviation(any(), any());
     }
 
     @Test

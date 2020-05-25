@@ -30,7 +30,8 @@ import org.mockito.MockitoAnnotations;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 /**
  *
@@ -57,6 +58,7 @@ public class CountryServiceImplTest {
         when(countryDaoMock.findCountries()).thenReturn(countries);
         List<Country> returnedCountries = countryService.findCountries();
         Assert.assertEquals(countries, returnedCountries);
+        verify(countryDaoMock, times(1)).findCountries();
     }
 
     @Test
@@ -67,6 +69,7 @@ public class CountryServiceImplTest {
         when(countryDaoMock.findCountryByAbbreviation("US")).thenReturn(country);
         Country returnedCountry = countryService.findCountryByAbbreviation("US");
         Assert.assertEquals(country, returnedCountry);
+        verify(countryDaoMock, times(1)).findCountryByAbbreviation("US");
     }
 
     @Test
@@ -76,5 +79,6 @@ public class CountryServiceImplTest {
         when(countryDaoMock.save(country)).thenReturn(country);
         Country returnedCountry = countryService.save(country);
         Assert.assertEquals(country, returnedCountry);
+        verify(countryDaoMock, times(1)).save(country);
     }
 }

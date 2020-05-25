@@ -29,7 +29,8 @@ import org.mockito.MockitoAnnotations;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 /**
  *
@@ -56,6 +57,7 @@ public class CountrySubdivisionServiceImplTest {
         when(countrySubdivisionDaoMock.findSubdivisions()).thenReturn(countrySubdivisions);
         List<CountrySubdivision> returnedCountrySubdivisions = countrySubdivisionService.findSubdivisions();
         Assert.assertEquals(countrySubdivisions, returnedCountrySubdivisions);
+        verify(countrySubdivisionDaoMock, times(1)).findSubdivisions();
     }
 
     @Test
@@ -65,6 +67,7 @@ public class CountrySubdivisionServiceImplTest {
         when(countrySubdivisionDaoMock.findSubdivisions("US")).thenReturn(countrySubdivisions);
         List<CountrySubdivision> returnedCountrySubdivisions = countrySubdivisionService.findSubdivisions("US");
         Assert.assertEquals(countrySubdivisions, returnedCountrySubdivisions);
+        verify(countrySubdivisionDaoMock, times(1)).findSubdivisions("US");
     }
 
     @Test
@@ -81,6 +84,10 @@ public class CountrySubdivisionServiceImplTest {
                         "Territories"
                 );
         Assert.assertEquals(countrySubdivisions, returnedCountrySubdivisions);
+        verify(countrySubdivisionDaoMock, times(1)).findSubdivisionsByCountryAndCategory(
+                "US",
+                "Territories"
+        );
     }
 
     @Test
@@ -91,6 +98,7 @@ public class CountrySubdivisionServiceImplTest {
         CountrySubdivision returnedCountrySubdivision =
                 countrySubdivisionService.findSubdivisionByAbbreviation("CA");
         Assert.assertEquals(countrySubdivision, returnedCountrySubdivision);
+        verify(countrySubdivisionDaoMock, times(1)).findSubdivisionByAbbreviation("CA");
     }
 
     @Test
@@ -104,6 +112,10 @@ public class CountrySubdivisionServiceImplTest {
         CountrySubdivision returnedCountrySubdivision =
                 countrySubdivisionService.findSubdivisionByCountryAndAltAbbreviation("US","CALI");
         Assert.assertEquals(countrySubdivision, returnedCountrySubdivision);
+        verify(countrySubdivisionDaoMock, times(1)).findSubdivisionByCountryAndAltAbbreviation(
+                "US",
+                "CALI"
+        );
     }
 
     @Test
@@ -117,6 +129,10 @@ public class CountrySubdivisionServiceImplTest {
         CountrySubdivision returnedCountrySubdivision =
                 countrySubdivisionService.findSubdivisionByCountryAndName("US","California");
         Assert.assertEquals(countrySubdivision, returnedCountrySubdivision);
+        verify(countrySubdivisionDaoMock, times(1)).findSubdivisionByCountryAndName(
+                "US",
+                "California"
+        );
     }
 
     @Test
@@ -126,5 +142,6 @@ public class CountrySubdivisionServiceImplTest {
         when(countrySubdivisionDaoMock.save(countrySubdivision)).thenReturn(countrySubdivision);
         CountrySubdivision returnedCountrySubdivision = countrySubdivisionService.save(countrySubdivision);
         Assert.assertEquals(countrySubdivision, returnedCountrySubdivision);
+        verify(countrySubdivisionDaoMock, times(1)).save(countrySubdivision);
     }
 }

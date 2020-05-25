@@ -22,6 +22,7 @@ import org.broadleafcommerce.profile.core.domain.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -31,8 +32,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.calls;
 
 /**
  *
@@ -64,6 +66,9 @@ public class CustomerPhoneServiceImplTest {
         when(customerPhoneDaoMock.save(customerPhone)).thenReturn(customerPhone);
         CustomerPhone returnedCustomerPhone = customerPhoneService.saveCustomerPhone(customerPhone);
         Assert.assertEquals(customerPhone, returnedCustomerPhone);
+        InOrder inOrder = inOrder(customerPhoneDaoMock);
+        inOrder.verify(customerPhoneDaoMock, calls(1)).readActiveCustomerPhonesByCustomerId(customerId);
+        inOrder.verify(customerPhoneDaoMock, calls(1)).save(customerPhone);
     }
 
     @Test
@@ -91,6 +96,10 @@ public class CustomerPhoneServiceImplTest {
         CustomerPhone returnedCustomerPhone = customerPhoneService.saveCustomerPhone(customerPhone);
         Assert.assertTrue(returnedCustomerPhone.getPhone().isDefault());
         Assert.assertEquals(customerPhone, returnedCustomerPhone);
+        InOrder inOrder = inOrder(customerPhoneDaoMock);
+        inOrder.verify(customerPhoneDaoMock, calls(1)).readActiveCustomerPhonesByCustomerId(customerId);
+        inOrder.verify(customerPhoneDaoMock, calls(1)).save(existingCustomerPhone);
+        inOrder.verify(customerPhoneDaoMock, calls(1)).save(customerPhone);
     }
 
     @Test
@@ -100,6 +109,7 @@ public class CustomerPhoneServiceImplTest {
         when(customerPhoneDaoMock.readActiveCustomerPhonesByCustomerId(customerId)).thenReturn(customerPhones);
         List<CustomerPhone> returnedCustomerPhones = customerPhoneService.readActiveCustomerPhonesByCustomerId(customerId);
         Assert.assertEquals(customerPhones, returnedCustomerPhones);
+        verify(customerPhoneDaoMock, times(1)).readActiveCustomerPhonesByCustomerId(customerId);
     }
 
     @Test
@@ -111,6 +121,7 @@ public class CustomerPhoneServiceImplTest {
         when(customerPhoneDaoMock.readCustomerPhoneById(phoneId)).thenReturn(customerPhone);
         CustomerPhone returnedCustomerPhone = customerPhoneService.readCustomerPhoneById(phoneId);
         Assert.assertEquals(customerPhone, returnedCustomerPhone);
+        verify(customerPhoneDaoMock, times(1)).readCustomerPhoneById(phoneId);
     }
 
     @Test
@@ -119,6 +130,7 @@ public class CustomerPhoneServiceImplTest {
         Long customerId = 12L;
         doNothing().when(customerPhoneDaoMock).makeCustomerPhoneDefault(phoneId, customerId);
         customerPhoneService.makeCustomerPhoneDefault(phoneId, customerId);
+        verify(customerPhoneDaoMock, times(1)).makeCustomerPhoneDefault(phoneId, customerId);
     }
 
     @Test
@@ -126,6 +138,7 @@ public class CustomerPhoneServiceImplTest {
         Long phoneId = 2L;
         doNothing().when(customerPhoneDaoMock).deleteCustomerPhoneById(phoneId);
         customerPhoneService.deleteCustomerPhoneById(phoneId);
+        verify(customerPhoneDaoMock, times(1)).deleteCustomerPhoneById(phoneId);
     }
 
     @Test
@@ -135,6 +148,7 @@ public class CustomerPhoneServiceImplTest {
         when(customerPhoneDaoMock.findDefaultCustomerPhone(customerId)).thenReturn(customerPhone);
         CustomerPhone returnedCustomerPhone = customerPhoneService.findDefaultCustomerPhone(customerId);
         Assert.assertEquals(customerPhone, returnedCustomerPhone);
+        verify(customerPhoneDaoMock, times(1)).findDefaultCustomerPhone(customerId);
     }
 
     @Test
@@ -144,6 +158,7 @@ public class CustomerPhoneServiceImplTest {
         when(customerPhoneDaoMock.readAllCustomerPhonesByCustomerId(customerId)).thenReturn(customerPhones);
         List<CustomerPhone> returnedCustomerPhones = customerPhoneService.readAllCustomerPhonesByCustomerId(customerId);
         Assert.assertEquals(customerPhones, returnedCustomerPhones);
+        verify(customerPhoneDaoMock, times(1)).readAllCustomerPhonesByCustomerId(customerId);
     }
 
     @Test
@@ -152,5 +167,6 @@ public class CustomerPhoneServiceImplTest {
         when(customerPhoneDaoMock.create()).thenReturn(customerPhone);
         CustomerPhone returnedCustomerPhone = customerPhoneService.create();
         Assert.assertEquals(customerPhone, returnedCustomerPhone);
+        verify(customerPhoneDaoMock, times(1)).create();
     }
 }

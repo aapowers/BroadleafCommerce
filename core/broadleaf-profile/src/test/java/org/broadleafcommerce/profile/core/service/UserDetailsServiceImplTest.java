@@ -21,6 +21,7 @@ import org.broadleafcommerce.profile.core.domain.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -29,7 +30,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 public class UserDetailsServiceImplTest {
     @Mock
@@ -51,6 +53,7 @@ public class UserDetailsServiceImplTest {
     public void testLoadUserByUsername_NonExistentUser_ShouldThrowException() {
         when(customerServiceMock.readCustomerByUsername("user1nonexistent")).thenReturn(null);
         userDetailsService.loadUserByUsername("user1nonexistent");
+        verify(customerServiceMock, times(1)).readCustomerByUsername("user1nonexistent");
     }
 
     @Test
@@ -66,6 +69,9 @@ public class UserDetailsServiceImplTest {
         Assertions.assertTrue(returnedUser.isCredentialsNonExpired());
         Assertions.assertFalse(returnedUser.isEnabled());
         Assertions.assertEquals(Arrays.toString(roles.toArray()), Arrays.toString(returnedUser.getAuthorities().toArray()));
+        InOrder inOrder = inOrder(customerServiceMock, roleServiceMock);
+        inOrder.verify(customerServiceMock, calls(1)).readCustomerByUsername("user2", false);
+        inOrder.verify(roleServiceMock, calls(1)).findCustomerRolesByCustomerId(any());
     }
 
     @Test
@@ -81,6 +87,9 @@ public class UserDetailsServiceImplTest {
         Assertions.assertFalse(returnedUser.isEnabled());
         roles.add("ROLE_USER");
         Assertions.assertEquals(Arrays.toString(roles.toArray()), Arrays.toString(returnedUser.getAuthorities().toArray()));
+        InOrder inOrder = inOrder(customerServiceMock, roleServiceMock);
+        inOrder.verify(customerServiceMock, calls(1)).readCustomerByUsername("user3", false);
+        inOrder.verify(roleServiceMock, calls(1)).findCustomerRolesByCustomerId(any());
     }
 
     @Test
@@ -96,6 +105,9 @@ public class UserDetailsServiceImplTest {
         Assertions.assertFalse(returnedUser.isCredentialsNonExpired());
         Assertions.assertFalse(returnedUser.isEnabled());
         Assertions.assertEquals(Arrays.toString(roles.toArray()), Arrays.toString(returnedUser.getAuthorities().toArray()));
+        InOrder inOrder = inOrder(customerServiceMock, roleServiceMock);
+        inOrder.verify(customerServiceMock, calls(1)).readCustomerByUsername("user4", false);
+        inOrder.verify(roleServiceMock, calls(1)).findCustomerRolesByCustomerId(any());
     }
 
     @Test
@@ -111,6 +123,9 @@ public class UserDetailsServiceImplTest {
         Assertions.assertFalse(returnedUser.isEnabled());
         roles.add("ROLE_USER");
         Assertions.assertEquals(Arrays.toString(roles.toArray()), Arrays.toString(returnedUser.getAuthorities().toArray()));
+        InOrder inOrder = inOrder(customerServiceMock, roleServiceMock);
+        inOrder.verify(customerServiceMock, calls(1)).readCustomerByUsername("user5", false);
+        inOrder.verify(roleServiceMock, calls(1)).findCustomerRolesByCustomerId(any());
     }
 
     @Test
@@ -126,6 +141,9 @@ public class UserDetailsServiceImplTest {
         Assertions.assertFalse(returnedUser.isCredentialsNonExpired());
         Assertions.assertTrue(returnedUser.isEnabled());
         Assertions.assertEquals(Arrays.toString(roles.toArray()), Arrays.toString(returnedUser.getAuthorities().toArray()));
+        InOrder inOrder = inOrder(customerServiceMock, roleServiceMock);
+        inOrder.verify(customerServiceMock, calls(1)).readCustomerByUsername("user6", false);
+        inOrder.verify(roleServiceMock, calls(1)).findCustomerRolesByCustomerId(any());
     }
 
     @Test
@@ -141,6 +159,9 @@ public class UserDetailsServiceImplTest {
         Assertions.assertTrue(returnedUser.isEnabled());
         roles.add("ROLE_USER");
         Assertions.assertEquals(Arrays.toString(roles.toArray()), Arrays.toString(returnedUser.getAuthorities().toArray()));
+        InOrder inOrder = inOrder(customerServiceMock, roleServiceMock);
+        inOrder.verify(customerServiceMock, calls(1)).readCustomerByUsername("user7", false);
+        inOrder.verify(roleServiceMock, calls(1)).findCustomerRolesByCustomerId(any());
     }
 
     @Test
@@ -157,6 +178,9 @@ public class UserDetailsServiceImplTest {
         Assertions.assertTrue(returnedUser.isCredentialsNonExpired());
         Assertions.assertTrue(returnedUser.isEnabled());
         Assertions.assertEquals(Arrays.toString(roles.toArray()), Arrays.toString(returnedUser.getAuthorities().toArray()));
+        InOrder inOrder = inOrder(customerServiceMock, roleServiceMock);
+        inOrder.verify(customerServiceMock, calls(1)).readCustomerByUsername("user8", false);
+        inOrder.verify(roleServiceMock, calls(1)).findCustomerRolesByCustomerId(any());
     }
 
     @Test
@@ -174,6 +198,9 @@ public class UserDetailsServiceImplTest {
         Assertions.assertTrue(returnedUser.isEnabled());
         roles.add("ROLE_USER");
         Assertions.assertEquals(Arrays.toString(roles.toArray()), Arrays.toString(returnedUser.getAuthorities().toArray()));
+        InOrder inOrder = inOrder(customerServiceMock, roleServiceMock);
+        inOrder.verify(customerServiceMock, calls(1)).readCustomerByUsername("user9", false);
+        inOrder.verify(roleServiceMock, calls(1)).findCustomerRolesByCustomerId(any());
     }
 
     /**

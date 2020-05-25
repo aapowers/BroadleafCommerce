@@ -22,6 +22,7 @@ import org.broadleafcommerce.profile.core.domain.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -30,8 +31,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.calls;
 
 /**
  *
@@ -77,6 +79,10 @@ public class CustomerAddressServiceImplTest {
         );
         CustomerAddress returnedCustomerAddress = customerAddressService.saveCustomerAddress(customerAddress);
         Assert.assertEquals(customerAddress, returnedCustomerAddress);
+        InOrder inOrder = inOrder(customerAddressDaoMock);
+        inOrder.verify(customerAddressDaoMock,
+                calls(1)).readActiveCustomerAddressesByCustomerId(customerId);
+        inOrder.verify(customerAddressDaoMock, calls(1)).save(customerAddress);
     }
 
     @Test
@@ -102,6 +108,10 @@ public class CustomerAddressServiceImplTest {
         )).thenReturn(customerAddress);
         CustomerAddress returnedCustomerAddress = customerAddressService.saveCustomerAddress(customerAddress);
         Assert.assertEquals(customerAddress, returnedCustomerAddress);
+        InOrder inOrder = inOrder(customerAddressDaoMock);
+        inOrder.verify(customerAddressDaoMock,
+                calls(1)).readActiveCustomerAddressesByCustomerId(customerId);
+        inOrder.verify(customerAddressDaoMock, calls(1)).save(customerAddress);
     }
 
     @Test
@@ -116,6 +126,8 @@ public class CustomerAddressServiceImplTest {
         List<CustomerAddress> returnedCustomerAddresses =
                 customerAddressService.readActiveCustomerAddressesByCustomerId(customerId);
         Assert.assertEquals(customerAddresses, returnedCustomerAddresses);
+        verify(customerAddressDaoMock, times(1)).readActiveCustomerAddressesByCustomerId(customerId);
+
     }
 
     @Test
@@ -126,6 +138,7 @@ public class CustomerAddressServiceImplTest {
         when(customerAddressDaoMock.readCustomerAddressById(customerAddressId)).thenReturn(customerAddress);
         CustomerAddress returnedCustomerAddress = customerAddressService.readCustomerAddressById(customerAddressId);
         Assert.assertEquals(customerAddress, returnedCustomerAddress);
+        verify(customerAddressDaoMock, times(1)).readCustomerAddressById(customerAddressId);
     }
 
     @Test
@@ -136,6 +149,7 @@ public class CustomerAddressServiceImplTest {
         // mock the service call that would call the database
         doNothing().when(customerAddressDaoMock).makeCustomerAddressDefault(customerAddressId, customerId);
         customerAddressService.makeCustomerAddressDefault(customerAddressId, customerId);
+        verify(customerAddressDaoMock, times(1)).makeCustomerAddressDefault(customerAddressId, customerId);
     }
 
     @Test
@@ -145,6 +159,7 @@ public class CustomerAddressServiceImplTest {
         // mock the service call that would call the database
         doNothing().when(customerAddressDaoMock).deleteCustomerAddressById(customerAddressId);
         customerAddressService.deleteCustomerAddressById(customerAddressId);
+        verify(customerAddressDaoMock, times(1)).deleteCustomerAddressById(customerAddressId);
     }
 
     @Test
@@ -155,6 +170,7 @@ public class CustomerAddressServiceImplTest {
         when(customerAddressDaoMock.findDefaultCustomerAddress(customerId)).thenReturn(customerAddress);
         CustomerAddress returnedCustomerAddress = customerAddressService.findDefaultCustomerAddress(customerId);
         Assert.assertEquals(customerAddress, returnedCustomerAddress);
+        verify(customerAddressDaoMock, times(1)).findDefaultCustomerAddress(customerId);
     }
 
     @Test
@@ -164,6 +180,7 @@ public class CustomerAddressServiceImplTest {
         when(customerAddressDaoMock.create()).thenReturn(customerAddress);
         CustomerAddress returnedCustomerAddress = customerAddressService.create();
         Assert.assertEquals(customerAddress, returnedCustomerAddress);
+        verify(customerAddressDaoMock, times(1)).create();
     }
 
     @Test
@@ -177,6 +194,7 @@ public class CustomerAddressServiceImplTest {
         )).thenReturn(customerAddresses);
         List<CustomerAddress> returnedCustomerAddresses = customerAddressService.readBatchAddresses(1,4);
         Assert.assertEquals(customerAddresses, returnedCustomerAddresses);
+        verify(customerAddressDaoMock, times(1)).readBatchCustomerAddresses(1,4);
     }
 
     @Test
@@ -186,5 +204,6 @@ public class CustomerAddressServiceImplTest {
         when(customerAddressDaoMock.readNumberOfAddresses()).thenReturn(numberOfAddresses);
         Long actualNumberOfAddresses = customerAddressService.readNumberOfAddresses();
         Assert.assertEquals(numberOfAddresses, actualNumberOfAddresses);
+        verify(customerAddressDaoMock, times(1)).readNumberOfAddresses();
     }
 }

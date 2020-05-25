@@ -30,7 +30,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  *
@@ -58,5 +58,6 @@ public class RoleServiceImplTest {
         when(roleDaoMock.readCustomerRolesByCustomerId(customerId)).thenReturn(customerRoles);
         List<CustomerRole> returnedCustomerRoles = roleService.findCustomerRolesByCustomerId(customerId);
         Assert.assertEquals(customerRoles, returnedCustomerRoles);
+        verify(roleDaoMock, times(1)).readCustomerRolesByCustomerId(customerId);
     }
 }

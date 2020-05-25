@@ -33,6 +33,7 @@ import org.broadleafcommerce.profile.core.service.listener.PostRegistrationObser
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -43,8 +44,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
 
 /**
  *
@@ -100,6 +102,7 @@ public class CustomerServiceImplTest {
         when(customerDaoMock.save(customer)).thenReturn(customer);
         Customer returnedCustomer = customerService.saveCustomer(customer);
         Assert.assertEquals(customer, returnedCustomer);
+        verify(customerDaoMock, times(1)).save(customer);
     }
 
     @Test
@@ -112,6 +115,7 @@ public class CustomerServiceImplTest {
         when(customerDaoMock.save(customer)).thenReturn(customer);
         Customer returnedCustomer = customerService.saveCustomer(customer, true);
         Assert.assertTrue(returnedCustomer.isRegistered());
+        verify(customerDaoMock, times(1)).save(customer);
     }
 
     @Test
@@ -125,6 +129,7 @@ public class CustomerServiceImplTest {
         when(customerDaoMock.save(customer)).thenReturn(customer);
         Customer returnedCustomer = customerService.saveCustomer(customer, true);
         Assert.assertTrue(returnedCustomer.isRegistered());
+        verify(customerDaoMock, times(1)).save(customer);
     }
 
     @Test
@@ -140,6 +145,7 @@ public class CustomerServiceImplTest {
         when(customerDaoMock.save(customer)).thenReturn(customer);
         Customer returnedCustomer = customerService.registerCustomer(customer, "asdf1234!", "asdf1234!");
         Assert.assertTrue(returnedCustomer.isRegistered());
+        verify(customerDaoMock, times(1)).save(customer);
     }
 
     @Test
@@ -152,6 +158,7 @@ public class CustomerServiceImplTest {
         Customer returnedCustomer = customerService.registerCustomer(customer, "asdf1234!", "asdf1234!");
         Assert.assertTrue(returnedCustomer.isRegistered());
         Assert.assertEquals(customer.getId(), returnedCustomer.getId());
+        verify(customerDaoMock, times(1)).save(customer);
     }
 
     @Test
@@ -161,7 +168,8 @@ public class CustomerServiceImplTest {
         customer.setEmailAddress(email);
         when(customerDaoMock.readCustomerByEmail(email)).thenReturn(customer);
         Customer returnedCustomer = customerService.readCustomerByEmail(email);
-        Assert.assertEquals(email, customer.getEmailAddress());
+        Assert.assertEquals(email, returnedCustomer.getEmailAddress());
+        verify(customerDaoMock, times(1)).readCustomerByEmail(email);
     }
 
     @Test
@@ -172,6 +180,7 @@ public class CustomerServiceImplTest {
         when(customerDaoMock.readCustomerByUsername(username)).thenReturn(customer);
         Customer returnedCustomer = customerService.readCustomerByUsername(username);
         Assert.assertEquals(username, customer.getUsername());
+        verify(customerDaoMock, times(1)).readCustomerByUsername(username);
     }
 
     @Test
@@ -182,6 +191,7 @@ public class CustomerServiceImplTest {
         when(customerDaoMock.readCustomerByUsername(username, true)).thenReturn(customer);
         Customer returnedCustomer = customerService.readCustomerByUsername(username, true);
         Assert.assertEquals(username, customer.getUsername());
+        verify(customerDaoMock, times(1)).readCustomerByUsername(username, true);
     }
 
     @Test
@@ -194,6 +204,9 @@ public class CustomerServiceImplTest {
         when(customerDaoMock.readCustomerByUsername("tester")).thenReturn(customer);
         Customer returnedCustomer = customerService.changePassword(passwordChange);
         Assert.assertEquals(passwordChange.getNewPassword(), returnedCustomer.getUnencodedPassword());
+        InOrder inOrder = inOrder(customerDaoMock);
+        inOrder.verify(customerDaoMock, calls(1)).readCustomerByUsername("tester");
+        inOrder.verify(customerDaoMock, calls(1)).save(customer);
     }
 
     @Test
@@ -205,6 +218,9 @@ public class CustomerServiceImplTest {
         when(customerDaoMock.readCustomerByUsername("tester")).thenReturn(customer);
         Customer returnedCustomer = customerService.resetPassword(passwordReset);
         Assert.assertEquals(22, returnedCustomer.getUnencodedPassword().length());
+        InOrder inOrder = inOrder(customerDaoMock);
+        inOrder.verify(customerDaoMock, calls(1)).readCustomerByUsername("tester");
+        inOrder.verify(customerDaoMock, calls(1)).save(customer);
     }
 
     @Test
@@ -225,6 +241,7 @@ public class CustomerServiceImplTest {
         when(customerDaoMock.create()).thenReturn(customer);
         Customer returnedCustomer = customerService.createCustomer();
         Assert.assertEquals(customer, returnedCustomer);
+        verify(customerDaoMock, times(1)).create();
     }
 
     @Test
@@ -235,6 +252,9 @@ public class CustomerServiceImplTest {
         when(customerDaoMock.create()).thenReturn(customer);
         Customer returnedCustomer = customerService.createCustomerFromId(customerId);
         Assert.assertEquals(customerId, returnedCustomer.getId());
+        InOrder inOrder = inOrder(customerDaoMock);
+        inOrder.verify(customerDaoMock, calls(1)).readCustomerById(customerId);
+        inOrder.verify(customerDaoMock, calls(1)).create();
     }
 
     @Test
@@ -245,6 +265,7 @@ public class CustomerServiceImplTest {
         when(customerDaoMock.readCustomerById(customerId)).thenReturn(customer);
         Customer returnedCustomer = customerService.createCustomerFromId(customerId);
         Assert.assertEquals("Test", returnedCustomer.getFirstName());
+        verify(customerDaoMock, times(1)).readCustomerById(customerId);
     }
 
     @Test
@@ -253,6 +274,7 @@ public class CustomerServiceImplTest {
         when(customerDaoMock.create()).thenReturn(customer);
         Customer returnedCustomer = customerService.createNewCustomer();
         Assert.assertEquals(customer, returnedCustomer);
+        verify(customerDaoMock, times(1)).create();
     }
 
     @Test
@@ -262,6 +284,10 @@ public class CustomerServiceImplTest {
         customer.setId(customerId);
         doNothing().when(roleDaoMock).removeCustomerRolesByCustomerId(customerId);
         doNothing().when(customerDaoMock).delete(customer);
+        customerService.deleteCustomer(customer);
+        InOrder inOrder = inOrder(customerDaoMock, roleDaoMock);
+        inOrder.verify(roleDaoMock, calls(1)).removeCustomerRolesByCustomerId(customerId);
+        inOrder.verify(customerDaoMock, calls(1)).delete(customer);
     }
 
     @Test
@@ -272,6 +298,7 @@ public class CustomerServiceImplTest {
         when(customerDaoMock.readCustomerById(customerId)).thenReturn(customer);
         Customer returnedCustomer = customerService.readCustomerById(customerId);
         Assert.assertEquals(customerId, customer.getId());
+        verify(customerDaoMock, times(1)).readCustomerById(customerId);
     }
 
     @Test
@@ -282,6 +309,7 @@ public class CustomerServiceImplTest {
         when(customerDaoMock.readCustomerByExternalId(externalId)).thenReturn(customer);
         Customer returnedCustomer = customerService.readCustomerByExternalId(externalId);
         Assert.assertEquals(externalId, customer.getExternalId());
+        verify(customerDaoMock, times(1)).readCustomerByExternalId(externalId);
     }
 
     @Test
@@ -293,12 +321,14 @@ public class CustomerServiceImplTest {
     public void testIsPasswordValid_Valid() {
         when(passwordEncoderBeanMock.matches("a","a")).thenReturn(true);
         Assert.assertTrue(customerService.isPasswordValid("a", "a"));
+        verify(passwordEncoderBeanMock, times(1)).matches("a","a");
     }
 
     @Test
     public void testIsPasswordValid_Invalid() {
         when(passwordEncoderBeanMock.matches("a","b")).thenReturn(false);
         Assert.assertFalse(customerService.isPasswordValid("a", "b"));
+        verify(passwordEncoderBeanMock, times(1)).matches("a","b");
     }
 
     @Test
@@ -324,6 +354,10 @@ public class CustomerServiceImplTest {
         tokens.add(new CustomerForgotPasswordSecurityTokenImpl());
         when(customerForgotPasswordSecurityTokenDaoMock.readUnusedTokensByCustomerId(customerId)).thenReturn(tokens);
         when(customerForgotPasswordSecurityTokenDaoMock.saveToken(tokens.get(0))).thenReturn(tokens.get(0));
+        customerService.invalidateAllTokensForCustomer(customer);
+        InOrder inOrder = inOrder(customerForgotPasswordSecurityTokenDaoMock);
+        inOrder.verify(customerForgotPasswordSecurityTokenDaoMock, calls(1)).readUnusedTokensByCustomerId(customerId);
+        inOrder.verify(customerForgotPasswordSecurityTokenDaoMock, calls(1)).saveToken(tokens.get(0));
     }
 
     @Test
@@ -423,6 +457,7 @@ public class CustomerServiceImplTest {
         when(customerDaoMock.readBatchCustomers(1, 20)).thenReturn(customers);
         List<Customer> returnedCustomers = customerService.readBatchCustomers(1, 20);
         Assert.assertEquals(customers, returnedCustomers);
+        verify(customerDaoMock, times(1)).readBatchCustomers(1,20);
     }
 
     @Test
@@ -431,5 +466,6 @@ public class CustomerServiceImplTest {
         when(customerDaoMock.readNumberOfCustomers()).thenReturn(numberOfCustomers);
         Long returnedNumber = customerService.readNumberOfCustomers();
         Assert.assertEquals(numberOfCustomers, returnedNumber);
+        verify(customerDaoMock, times(1)).readNumberOfCustomers();
     }
 }
